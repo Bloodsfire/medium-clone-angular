@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { Actions, createEffect, ofType } from '@ngrx/effects'
-import { catchError, map, switchMap } from 'rxjs/operators'
+import { catchError, map, switchMap, tap } from 'rxjs/operators'
 import { of } from 'rxjs'
 
 import { AuthService } from '../../services/auth.service'
@@ -11,6 +11,8 @@ import {
   registerSuccessAction,
 } from '../actions/register.action'
 import { HttpErrorResponse } from '@angular/common/http'
+import { PersistanceService } from '../../../shared/services/persistance.service'
+import { Router } from '@angular/router'
 
 @Injectable()
 export class RegisterEffect {
@@ -20,6 +22,7 @@ export class RegisterEffect {
       switchMap(({ request }) => {
         return this.authService.register(request).pipe(
           map((currentUser: CurrentUserInterface) => {
+            this.persistanceService.set('accessToken', currentUser.token)
             return registerSuccessAction({ currentUser })
           }),
           catchError((errorResponse: HttpErrorResponse) => {
@@ -32,5 +35,21 @@ export class RegisterEffect {
     )
   )
 
-  constructor(private actions$: Actions, private authService: AuthService) {}
+  redirectAfterSubmit$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(registerSuccessAction),
+        tap(() => {
+          this.router.navigateByUrl('/')
+        })
+      ),
+    { dispatch: false }
+  )
+
+  constructor(
+    private actions$: Actions,
+    private authService: AuthService,
+    private persistanceService: PersistanceService,
+    private router: Router
+  ) {}
 }
