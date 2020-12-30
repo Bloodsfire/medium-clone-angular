@@ -14,7 +14,7 @@ import {
 } from '../actions/getCurrentUser.action'
 
 @Injectable()
-export class getCurrentUserEffect {
+export class GetCurrentUserEffect {
   getCurrentUser$ = createEffect(() =>
     this.actions$.pipe(
       ofType(getCurrentUserAction),
