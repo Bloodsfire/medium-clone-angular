@@ -13,7 +13,7 @@ import { RegisterEffect } from './store/effects/register.effect'
 import { LoginEffect } from './store/effects/login.effect'
 import { BackendErrorMessagesModule } from '../shared/modules/backendErrorMessages/backendErrorMessages.module'
 import { LoginComponent } from './components/login/login.component'
-import { getCurrentUserEffect } from './store/effects/getCurrentUser.effect'
+import { GetCurrentUserEffect } from './store/effects/getCurrentUser.effect'
 
 const routes: Routes = [
   {
@@ -35,7 +35,7 @@ const routes: Routes = [
     EffectsModule.forFeature([
       RegisterEffect,
       LoginEffect,
-      getCurrentUserEffect,
+      GetCurrentUserEffect,
     ]),
     BackendErrorMessagesModule,
   ],
