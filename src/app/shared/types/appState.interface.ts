@@ -4,6 +4,7 @@ import { PopularTagsStateInterface } from '../modules/popularTags/types/popularT
 import { ArticleInterface } from './article.interface'
 import { CreateArticleStateInterface } from '../../createArticle/types/createArticleState.interface'
 import { EditArticleStateInterface } from '../../editArticle/types/editArticleState.interface'
+import { SettingsStateInterface } from '../../settings/types/settingsState.interface'
 
 export interface AppStateInterface {
   auth: AuthStateInterface
@@ -12,4 +13,5 @@ export interface AppStateInterface {
   article: ArticleInterface
   createArticle: CreateArticleStateInterface
   editArticle: EditArticleStateInterface
+  settings: SettingsStateInterface
 }
