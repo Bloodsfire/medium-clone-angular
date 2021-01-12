@@ -5,27 +5,27 @@ import { of } from 'rxjs'
 import { HttpErrorResponse } from '@angular/common/http'
 import { Router } from '@angular/router'
 
-import { CreateArticleService } from '../../services/createArticle.service'
+import { EditArticleService } from '../../services/editArticle.service'
 import {
-  createArticleAction,
-  createArticleFailureAction,
-  createArticleSuccessAction,
-} from '../actions/createArticle.action'
+  updateArticleAction,
+  updateArticleSuccessAction,
+  updateArticleFailureAction,
+} from '../actions/updateArticle.action'
 import { ArticleInterface } from '../../../shared/types/article.interface'
 
 @Injectable()
-export class CreateArticleEffect {
-  createArticle$ = createEffect(() =>
+export class UpdateArticleEffect {
+  updateArticle$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(createArticleAction),
-      switchMap(({ articleInput }) => {
-        return this.createArticleService.createArticle(articleInput).pipe(
+      ofType(updateArticleAction),
+      switchMap(({ articleInput, slug }) => {
+        return this.editArticleService.updateArticle(slug, articleInput).pipe(
           map((article: ArticleInterface) => {
-            return createArticleSuccessAction({ article })
+            return updateArticleSuccessAction({ article })
           }),
           catchError((errorResponse: HttpErrorResponse) => {
             return of(
-              createArticleFailureAction({ errors: errorResponse.error.errors })
+              updateArticleFailureAction({ errors: errorResponse.error.errors })
             )
           })
         )
@@ -33,10 +33,10 @@ export class CreateArticleEffect {
     )
   )
 
-  redirectAfterCreate$ = createEffect(
+  redirectAfterUpdate$ = createEffect(
     () =>
       this.actions$.pipe(
-        ofType(createArticleSuccessAction),
+        ofType(updateArticleSuccessAction),
         tap(({ article }) => {
           this.router.navigate(['/articles', article.slug])
         })
@@ -46,7 +46,7 @@ export class CreateArticleEffect {
 
   constructor(
     private actions$: Actions,
-    private createArticleService: CreateArticleService,
+    private editArticleService: EditArticleService,
     private router: Router
   ) {}
 }
