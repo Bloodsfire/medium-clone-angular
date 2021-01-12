@@ -18,6 +18,7 @@ import { GlobalFeedModule } from './globalFeed/globalFeed.module'
 import { YourFeedModule } from './yourFeed/yourFeed.module'
 import { TagFeedModule } from './tagFeed/tagFeed.module'
 import { ArticleModule } from './article/article.module'
+import { CreateArticleModule } from './createArticle/createArticle.module'
 
 @NgModule({
   declarations: [AppComponent],
@@ -32,12 +33,13 @@ import { ArticleModule } from './article/article.module'
       maxAge: 25,
       logOnly: environment.production,
     }),
+    StoreRouterConnectingModule.forRoot(),
     TopBarModule,
     GlobalFeedModule,
     YourFeedModule,
     TagFeedModule,
+    CreateArticleModule,
     ArticleModule,
-    StoreRouterConnectingModule.forRoot(),
   ],
   providers: [
     PersistanceService,
