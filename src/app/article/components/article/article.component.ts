@@ -1,89 +1,73 @@
-import {
-  Component,
-  Input,
-  OnChanges,
-  OnDestroy,
-  OnInit,
-  SimpleChanges,
-} from '@angular/core'
-import { ActivatedRoute, Params, Router } from '@angular/router'
+import { Component, OnDestroy, OnInit } from '@angular/core'
 import { select, Store } from '@ngrx/store'
-import { Observable, Subscription } from 'rxjs'
+import { ActivatedRoute } from '@angular/router'
+import { combineLatest, Observable, Subscription } from 'rxjs'
+import { map } from 'rxjs/operators'
 
-import { parseUrl, stringify } from 'query-string'
-
-import { environment } from '../../../../../../environments/environment'
 import { getArticleAction } from '../../store/actions/getArticle.action'
-import { GetFeedResponseInterface } from '../../types/getFeedResponse.interface'
+import { ArticleInterface } from '../../../shared/types/article.interface'
 import {
+  articleSelector,
   errorSelector,
-  feedSelector,
   isLoadingSelector,
 } from '../../store/selectors'
+import { currentUserSelector } from '../../../auth/store/selectors'
+import { CurrentUserInterface } from '../../../shared/types/currentUser.interface'
 
 @Component({
-  selector: 'mc-feed',
+  selector: 'mc-article',
   templateUrl: './article.component.html',
   styleUrls: ['./article.component.scss'],
 })
-export class ArticleComponent implements OnInit, OnDestroy, OnChanges {
-  @Input('apiUrl') apiUrlProps: string
-
+export class ArticleComponent implements OnInit, OnDestroy {
+  slug: string
+  article: ArticleInterface | null
+  articleSubscription: Subscription
   isLoading$: Observable<boolean>
   error$: Observable<string | null>
-  feed$: Observable<GetFeedResponseInterface | null>
-  queryParamsSubscription: Subscription
-  limit = environment.limit
-  baseUrl: string
-  currentPage: number
+  isAuthor$: Observable<boolean>
 
-  constructor(
-    private store: Store,
-    private router: Router,
-    private route: ActivatedRoute
-  ) {}
+  constructor(private store: Store, private route: ActivatedRoute) {}
 
   ngOnInit(): void {
-    this.initializeValues()
-    this.initializeListeners()
+    this.initializedValues()
+    this.initializedListeners()
+    this.fetchData()
   }
 
-  ngOnDestroy() {
-    this.queryParamsSubscription.unsubscribe()
+  ngOnDestroy(): void {
+    this.articleSubscription.unsubscribe()
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    const isApiUrlChanged =
-      !changes.apiUrlProps.firstChange &&
-      changes.apiUrlProps.currentValue !== changes.apiUrlProps.previousValue
-    if (isApiUrlChanged) this.fetchFeed()
-  }
-
-  initializeValues(): void {
+  initializedValues(): void {
+    this.slug = this.route.snapshot.paramMap.get('slug')
     this.isLoading$ = this.store.pipe(select(isLoadingSelector))
     this.error$ = this.store.pipe(select(errorSelector))
-    this.feed$ = this.store.pipe(select(feedSelector))
-    this.baseUrl = this.router.url.split('?')[0]
-  }
-
-  initializeListeners(): void {
-    this.queryParamsSubscription = this.route.queryParams.subscribe(
-      (params: Params) => {
-        this.currentPage = Number(params.page || '1')
-        this.fetchFeed()
-      }
+    this.isAuthor$ = combineLatest(
+      this.store.pipe(select(articleSelector)),
+      this.store.pipe(select(currentUserSelector))
+    ).pipe(
+      map(
+        ([article, currentUser]: [
+          ArticleInterface | null,
+          CurrentUserInterface
+        ]) => {
+          if (!article || !currentUser) return false
+          return currentUser.username === article.author.username
+        }
+      )
     )
   }
 
-  fetchFeed(): void {
-    const offset = this.currentPage * this.limit - this.limit
-    const parsedUrl = parseUrl(this.apiUrlProps)
-    const stringifiedParams = stringify({
-      limit: this.limit,
-      offset,
-      ...parsedUrl.query,
-    })
-    const apiUrlWithParams = `${parsedUrl.url}?${stringifiedParams}`
-    this.store.dispatch(getArticleAction({ url: apiUrlWithParams }))
+  initializedListeners(): void {
+    this.articleSubscription = this.store
+      .pipe(select(articleSelector))
+      .subscribe((article: ArticleInterface | null) => {
+        this.article = article
+      })
+  }
+
+  fetchData(): void {
+    this.store.dispatch(getArticleAction({ slug: this.slug }))
   }
 }
