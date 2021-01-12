@@ -6,7 +6,7 @@ export interface ArticleInterface {
   title: string
   description: string
   favorited: boolean
-  favoritedCount: number
+  favoritesCount: number
   slug: string
   tagList: string[]
   createdAt: string
