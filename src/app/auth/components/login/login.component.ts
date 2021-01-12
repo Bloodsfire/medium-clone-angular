@@ -7,7 +7,7 @@ import {
   isSubmittingSelector,
   validationErrorsSelector,
 } from '../../store/selectors'
-import { BackedErrorsInterface } from '../../../shared/types/backedErrors.interface'
+import { BackendErrorsInterface } from '../../../shared/types/backendErrors.interface'
 import { LoginRequestInterface } from '../../types/loginRequest.interface'
 import { loginAction } from '../../store/actions/login.action'
 
@@ -19,7 +19,7 @@ import { loginAction } from '../../store/actions/login.action'
 export class LoginComponent implements OnInit {
   form: FormGroup
   isSubmitting$: Observable<boolean>
-  backendErrors$: Observable<BackedErrorsInterface | null>
+  backendErrors$: Observable<BackendErrorsInterface | null>
 
   constructor(private fb: FormBuilder, private store: Store) {}
 

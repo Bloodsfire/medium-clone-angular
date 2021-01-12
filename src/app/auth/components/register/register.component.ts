@@ -9,7 +9,7 @@ import {
   isSubmittingSelector,
   validationErrorsSelector,
 } from '../../store/selectors'
-import { BackedErrorsInterface } from '../../../shared/types/backedErrors.interface'
+import { BackendErrorsInterface } from '../../../shared/types/backendErrors.interface'
 
 @Component({
   selector: 'mc-register',
@@ -19,7 +19,7 @@ import { BackedErrorsInterface } from '../../../shared/types/backedErrors.interf
 export class RegisterComponent implements OnInit {
   form: FormGroup
   isSubmitting$: Observable<boolean>
-  backendErrors$: Observable<BackedErrorsInterface | null>
+  backendErrors$: Observable<BackendErrorsInterface | null>
 
   constructor(private fb: FormBuilder, private store: Store) {}
 
